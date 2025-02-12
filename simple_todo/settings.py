@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-htq&co_2+c$w&ozpb#9!7lo305x2f=-_779c5y8@xsenag=#3@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['todo-app.local']
 
 
 # Application definition
