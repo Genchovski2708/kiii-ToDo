@@ -1,0 +1,72 @@
+{% extends "todo_app/base.html" %}
+
+{% block title %}My Tasks{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-2xl font-bold">My Tasks</h2>
+            <p class="text-gray-600">{{ completed_tasks }}/{{ total_tasks }} tasks completed</p>
+        </div>
+        <a href="{% url 'add_task' %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Add Task
+        </a>
+    </div>
+
+    <div class="space-y-4">
+        {% for task in tasks %}
+            <div class="flex items-center justify-between p-4 {% if not forloop.last %}border-b{% endif %} {% if task.completed %}bg-gray-50{% endif %}">
+                <div class="flex items-center space-x-4">
+                    <input type="checkbox" 
+                           class="task-checkbox form-checkbox h-5 w-5 text-blue-600" 
+                           data-task-id="{{ task.id }}"
+                           {% if task.completed %}checked{% endif %}>
+                    <div>
+                        <h3 class="font-medium {% if task.completed %}line-through text-gray-500{% endif %}">
+                            {{ task.title }}
+                        </h3>
+                        {% if task.description %}
+                            <p class="text-gray-600 text-sm">{{ task.description }}</p>
+                        {% endif %}
+                        <div class="text-sm text-gray-500 mt-1">
+                            <span class="bg-{{ task.priority }}-100 text-{{ task.priority }}-800 px-2 py-1 rounded-full text-xs">
+                                {{ task.priority|title }}
+                            </span>
+                            {% if task.due_date %}
+                                <span class="ml-2">Due: {{ task.due_date }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <form method="post" action="{% url 'delete_task' task.id %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-600 hover:text-red-800">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        {% empty %}
+            <p class="text-gray-500 text-center py-4">No tasks yet. Add your first task!</p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('.task-checkbox').change(function() {
+        const taskId = $(this).data('task-id');
+        $.ajax({
+            url: `/toggle/${taskId}/`,
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            success: function() {
+                location.reload();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
